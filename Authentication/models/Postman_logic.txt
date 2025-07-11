@@ -1,0 +1,178 @@
+🟢 1. SIGNUP – Create a new user
+POST http://localhost:3000/auth/signup
+| Key          | Value            |
+| ------------ | ---------------- |
+| Content-Type | application/json |
+
+🧠 Body (raw → JSON)
+{
+  "name": "Sagar Jha",
+  "username": "sagar123",
+  "password": "securepassword",
+  "email": "sagar@example.com",
+  "role": "admin"
+}
+🔐 2. LOGIN – Authenticate a user
+POST http://localhost:3000/auth/login
+
+| Key          | Value            |
+| ------------ | ---------------- |
+| Content-Type | application/json |
+
+
+🧠 Body (raw → JSON)
+{
+  "username": "sagar123",
+  "password": "securepassword"
+}
+ or 
+ {
+  "username": "admin1",
+  "password": "adminpass"
+}
+
+✅ STEP 3: Create an Incident
+POST http://localhost:3000/incidents
+Headers:
+
+Authorization: Bearer <your_token>
+
+📄 Body:
+
+json
+Copy code
+{
+  "title": "Server Down",
+  "description": "Main server is not responding",
+  "type": "bug",
+  "priority": "high"
+}
+✅ Roles allowed: admin, engineer, user
+
+✅ STEP 4: View All Incidents
+GET http://localhost:3000/incidents
+Headers:
+
+Authorization: Bearer <admin_or_engineer_token>
+
+✅ Only roles: admin, engineer
+
+pdate Incident (PUT)
+URL: http://localhost:3000/incidents/684ecfd670a8945f1b22d07e
+(replace with your actual incident _id)
+
+Method: PUT
+
+Headers:
+
+Authorization: Bearer <your_token>
+
+Content-Type: application/json
+
+Body:
+
+json
+Copy code
+{
+  "status": "in-progress",
+  "priority": "high"
+}
+ 3. Delete This Incident (DELETE)
+Method: DELETE
+
+URL: http://localhost:3000/incidents/684ecfc070a8945f1b22d07c
+
+Headers:
+
+Authorization: Bearer <admin_token>
+
+Only users with admin role can delete.
+
+🕓 2. Assign SLA based on priority
+Method: POST
+URL: http://localhost:3000/sla/assign-sla
+
+Headers:
+
+Authorization: Bearer YOUR_JWT_TOKEN
+
+Body (JSON):
+
+json
+Copy code
+{
+  "id": "684ecfb070a8945f1b22d07a",  // Example incident ID
+  "priority": "high"
+}
+SLA will be set to 4 hours for "high" priority.
+
+✅ Repeat for any incident using its _id.
+
+✅ Step 3: Check SLA Violations
+Method: GET
+URL: http://localhost:3000/sla/violations
+
+Headers:
+
+Authorization: Bearer YOUR_ADMIN_TOKEN
+
+Expected Result:
+This incident should appear in the violations list.
+
+
+2. 🚨 Manually Escalate
+POST http://localhost:3000/api/escalations/manual
+
+Headers:
+
+http
+Copy code
+Authorization: Bearer <admin_token>
+Content-Type: application/json
+Body:
+
+json
+Copy code
+{
+  "id": "684feb90007de25c43f36191"
+}
+If successful, you'll get:
+
+
+
+4. AUTO-TRIGGER VIA SLA VIOLATION
+If you want to test automatic notification via SLA, follow these:
+
+Create an old incident (backdate createdAt).
+
+Assign SLA to it (e.g., high → 4 hours).
+
+Call:
+
+http
+Copy code
+GET http://localhost:3000/sla/violations
+Authorization: Bearer <admin_token>
+
+
+📥 Example Requests:
+CSV:
+
+lua
+Copy code
+GET /reports/incidents?status=open&format=csv
+PDF:
+
+pgsql
+Copy code
+GET /reports/incidents?priority=high&startDate=2025-06-01&endDate=2025-06-17&format=pdf
+✅ Must include Authorization: Bearer <admin_or_manager_token>
+
+
+ Test Audit Logs
+Make a request like:
+
+http
+Copy code
+GET /audit
+Authorization: Bearer <admin_token>
