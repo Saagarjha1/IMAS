@@ -237,7 +237,7 @@ Logs are stored in `AuditLog` collection.
 
 ## 👨‍💼 Maintained By
 
-**Sagar Jha** — [LinkedIn](https://www.linkedin.com) | [GitHub](https://github.com)
+**Sagar Jha** — [LinkedIn](https://www.linkedin.com/in/sagar0333/) | [GitHub]([https://github.com](https://github.com/Saagarjha1/profile/tree/main))
 
 > Contributions welcome. Fork it. Star it. Improve it!
 
