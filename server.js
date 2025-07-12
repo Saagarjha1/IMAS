@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const db = require('./db'); // Ensure db.js connects to MongoDB
 require('dotenv').config();
-require('./Notifications/notificationWorker');
+require('./notificationWorker');
 
 app.use(express.json()); // Middleware to parse JSON
 

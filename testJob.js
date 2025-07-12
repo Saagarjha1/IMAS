@@ -1,5 +1,5 @@
 // testJob.js
-const { addNotificationJob } = require('./Notifications/notificationQueue');
+const { addNotificationJob } = require('./notificationQueue');
 
 addNotificationJob({
   userId: '6851316694e48f5a616dc648', // Use a valid engineer ID

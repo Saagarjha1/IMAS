@@ -1,9 +1,11 @@
 const express= require('express');
 const router=express.Router();
+
 const Incident=require('../../Incident/models/Incident');
 const {jwtAuthMiddleware}=require('../../jwt');
 const rbac=require('../../rbac');
-const { addNotificationJob } = require('../../Notifications/notificationQueue');
+const { checkSlaViolations } = require('../../slaViolationChecker'); //Added import
+const { addNotificationJob } = require('../../notificationQueue');
 const { logAudit } = require('../../AuditLogs/logger/auditLogger');
 console.log('🧪 DEBUG — typeof logAudit:', typeof logAudit);
 // 📌 Assign SLA Hours Based on Priority
@@ -45,54 +47,13 @@ router.post('/assign-sla', jwtAuthMiddleware, rbac(['admin']), async (req, res) 
 // 🚨 Get SLA Violations and Queue Notifications
 router.get('/violations', jwtAuthMiddleware, rbac(['admin', 'engineer']), async (req, res) => {
   try {
-    const now = new Date();
-
-    const violations = await Incident.find({
-      status: { $ne: 'closed' },
-      slaHours: { $exists: true },
-      $expr: {
-        $lt: [
-          { $add: ["$createdAt", { $multiply: ["$slaHours", 3600000] }] },
-          now
-        ]
-      }
-    });
-
-    const queued = [];
-    const skipped = [];
-
-    for (let incident of violations) {
-      if (incident.assignedTo) {
-        console.log(`📤 Queuing SLA notification for: ${incident.title}`);
-
-        await addNotificationJob({
-          userId: incident.assignedTo,
-          message: `🚨 SLA violated for incident "${incident.title}"`,
-          type: 'escalation'
-        });
-
-        // ✅ Log SLA breach
-        await logAudit({
-          action: 'SLA_BREACH',
-          actor: req.user.id,
-          target: incident._id,
-          description: `SLA violated for "${incident.title}"`
-        });
-
-        queued.push(incident.title);
-      } else {
-        console.log(`⚠️ Skipped: No assigned engineer for incident "${incident.title}"`);
-        skipped.push(incident.title);
-      }
-    }
+    const result = await checkSlaViolations(req.user.id); // ✅ Optional: log actor
 
     res.status(200).json({
       message: 'SLA violations processed.',
-      total: violations.length,
-      queuedCount: queued.length,
-      skippedCount: skipped.length,
-      queued,
-      skipped
+      notified: result.notifiedCount,
+      skipped: result.skippedCount,
+      totalViolations: result.violations.length
     });
   } catch (err) {
     console.error('Error checking SLA violations:', err);

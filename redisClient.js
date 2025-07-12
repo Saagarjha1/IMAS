@@ -1,24 +1,24 @@
-const { Client } = require('@elastic/elasticsearch');
+const Redis = require('ioredis');
+require('dotenv').config();
 
-// 🧠 Load environment variables
-require('dotenv').config(); // In case not already loaded
+const redisUrl = process.env.REDIS_URL;
 
-const elasticNode = process.env.ELASTIC_NODE;
-
-if (!elasticNode) {
-  console.error('❌ ELASTIC_NODE is not set in .env');
+if (!redisUrl) {
+  console.error('❌ REDIS_URL is not set in .env');
   process.exit(1);
 }
 
-const elasticClient = new Client({
-  node: elasticNode,
+const redisClient = new Redis(redisUrl, {
+  maxRetriesPerRequest: null, // ✅ Required for Upstash & BullMQ
 });
 
-elasticClient.ping()
-  .then(() => console.log('✅ Elasticsearch connected'))
-  .catch((err) => {
-    console.error('❌ Elasticsearch connection failed:', err);
-    process.exit(1);
-  });
+redisClient.on('connect', () => {
+  console.log('✅ Redis connected');
+});
 
-module.exports = elasticClient;
+redisClient.on('error', (err) => {
+  console.error('❌ Redis connection error:', err);
+  process.exit(1);
+});
+
+module.exports = redisClient;
