@@ -3,7 +3,14 @@
 **IMAS** is a scalable and modular backend system for managing incidents, SLAs, escalations, and real-time notifications in a production environment. Built with **Node.js**, **Express**, **MongoDB**, **Redis**, and **BullMQ**, it supports role-based access, reporting, and auditing for operational transparency.
 
 ---
+## 🌐 Live Demo
 
+**🚀 Deployed on Render**  
+🔗 [https://imas.onrender.com](https://imas.onrender.com)
+
+You can test all public and protected endpoints using tools like **Postman** or **curl**.
+
+---
 ## 🔧 Features
 
 * ✅ **Authentication & RBAC**: JWT-based login with admin, engineer, and user roles.
@@ -133,8 +140,11 @@ Authorization: Bearer <token>
 ---
 
 ## 📬 Endpoints Overview
+**🚀 Deployed on Render:**  
+🔗 [https://imas.onrender.com](https://imas.onrender.com)
 
 ### 🔐 Auth
+
 
 | Method | Endpoint       | Role   |
 | ------ | -------------- | ------ |
